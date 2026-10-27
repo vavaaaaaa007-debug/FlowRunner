@@ -1,0 +1,49 @@
+# 打包发布：打 tag 就自动在 Windows / macOS 上构建可执行文件并发 Release。
+# 用法：
+#   git tag v1.0.0 && git push origin v1.0.0
+# 然后到仓库的 Releases 页下载 FlowRunner-windows.zip / FlowRunner-macos.zip。
+# 也可以在 Actions 页点 Run workflow 手动构建（只产出 Artifact，不发 Release）。
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            suffix: windows
+          - os: macos-latest
+            suffix: macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+      - name: Build with PyInstaller
+        run: pyinstaller FlowRunner.spec --noconfirm
+      - name: Zip the bundle
+        run: python -c "import shutil; shutil.make_archive('FlowRunner-${{ matrix.suffix }}', 'zip', 'dist', 'FlowRunner')"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlowRunner-${{ matrix.suffix }}
+          path: FlowRunner-${{ matrix.suffix }}.zip
+      - name: Publish Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: FlowRunner-${{ matrix.suffix }}.zip
