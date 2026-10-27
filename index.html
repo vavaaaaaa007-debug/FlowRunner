@@ -1,0 +1,501 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flow Runner</title>
+<style>
+:root,body[data-t="light"]{--bg:#fdfefd;--card:#ffffff;--in:#f5f8f6;--pri:#25986b;--on:#ffffff;--hl:#fff3a6;--txt:#1d2b26;--mut:#7a8c83;--bd:#ecf1ee;--side:transparent;--sel:#f0f7f3;--ok:#1f9d6b;--bad:#d9534f;--sh:0 1px 2px #1d2b2604,0 8px 24px -14px #1d2b2622}
+body[data-t="dark"]{--bg:#121816;--card:#1a221f;--in:#232d29;--pri:#6fe0b4;--on:#07261c;--hl:#4a4521;--txt:#e6f0ec;--mut:#8da198;--bd:#2b3733;--side:transparent;--sel:#27342f;--ok:#6fe0b4;--bad:#f0928d;--sh:0 10px 30px -14px #000a}
+body[data-t="soft"]{--bg:#f6f9ef;--card:#ffffff;--in:#eef3e2;--pri:#2f8f6b;--on:#fff;--hl:#fbf1a0;--txt:#26322a;--mut:#7d8a74;--bd:#e0e8d2;--side:transparent;--sel:#e8efd9;--ok:#2f8f6b;--bad:#d9534f;--sh:0 10px 30px -14px #2f8f6b44}
+body[data-t="black"]{--bg:#0c0f0d;--card:#141917;--in:#1c2320;--pri:#8ff0c8;--on:#08261c;--hl:#4a4521;--txt:#e4ede9;--mut:#85948d;--bd:#27302c;--side:transparent;--sel:#222b27;--ok:#6fe0b4;--bad:#f0928d;--sh:0 10px 30px -14px #000}
+*{box-sizing:border-box}
+body{font:14px/1.6 -apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;margin:0;display:flex;height:100vh;background:var(--bg);color:var(--txt)}
+button,input,select,textarea{font:inherit;color:inherit}
+#side{width:220px;background:var(--side);display:flex;flex-direction:column;padding:22px 14px;flex-shrink:0}
+.brand{display:flex;gap:12px;align-items:center;padding:0 10px 26px}
+.brand i{position:relative;width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,#ffe14d 0%,#ffb020 55%,#ff7a3d 100%);color:#fff;display:grid;place-items:center;font-style:italic;font-weight:900;font-size:24px;text-shadow:0 2px 0 #e8641c66;transform:rotate(-6deg);box-shadow:0 8px 18px -6px #ff9a2ecc,inset 0 2px 0 #ffffff80;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.brand i:hover{transform:rotate(6deg) scale(1.1)}
+.brand i:after{content:"✦";position:absolute;top:-7px;right:-6px;font-size:13px;font-style:normal;color:#ffd43b;text-shadow:0 0 6px #ffd43b99;animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{0%,100%{transform:scale(.7) rotate(0);opacity:.7}50%{transform:scale(1.15) rotate(20deg);opacity:1}}
+.brand b{position:relative;display:inline-block;font-family:ui-rounded,"SF Pro Rounded","Nunito","Varela Round","PingFang SC",system-ui,sans-serif;font-size:20px;font-weight:800;font-style:italic;letter-spacing:-.02em;line-height:1.15;white-space:nowrap;padding-bottom:5px}
+.brand b em{display:inline-block;font-style:inherit;transition:transform .3s cubic-bezier(.3,1.8,.5,1)}
+.brand b .f{background:linear-gradient(180deg,#ff9f1a,#ff5e62);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand b .r{color:var(--txt)}
+.brand b em:nth-child(1){transform:translateY(-1px) rotate(-6deg)}.brand b em:nth-child(2){transform:translateY(1px)}.brand b em:nth-child(3){transform:translateY(-1px) rotate(4deg)}.brand b em:nth-child(4){transform:translateY(1px) rotate(-3deg)}
+.brand b em:nth-child(6){transform:translateY(-1px) rotate(-4deg)}.brand b em:nth-child(7){transform:translateY(1px)}.brand b em:nth-child(8){transform:translateY(-1px) rotate(3deg)}.brand b em:nth-child(9){transform:translateY(1px) rotate(-3deg)}.brand b em:nth-child(10){transform:translateY(-1px) rotate(5deg)}.brand b em:nth-child(11){transform:translateY(0) rotate(-2deg)}
+.brand:hover b em{animation:hop .6s ease both}
+.brand:hover b em:nth-child(2){animation-delay:.04s}.brand:hover b em:nth-child(3){animation-delay:.08s}.brand:hover b em:nth-child(4){animation-delay:.12s}.brand:hover b em:nth-child(6){animation-delay:.16s}.brand:hover b em:nth-child(7){animation-delay:.2s}.brand:hover b em:nth-child(8){animation-delay:.24s}.brand:hover b em:nth-child(9){animation-delay:.28s}.brand:hover b em:nth-child(10){animation-delay:.32s}.brand:hover b em:nth-child(11){animation-delay:.36s}
+@keyframes hop{40%{transform:translateY(-6px) rotate(-6deg)}}
+.brand b:after{content:"";position:absolute;left:0;right:2px;bottom:0;height:7px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 Q 13 0 25 4 T 50 4 T 75 4 T 99 3' fill='none' stroke='%23ffc933' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center/100% 100%}
+.brand small{display:flex;align-items:center;gap:6px;margin-top:4px;color:var(--mut);font-size:12px;font-weight:500;letter-spacing:.18em}
+.brand small:before{content:"";width:7px;height:7px;border-radius:50%;background:#ffb020;box-shadow:0 0 0 3px #ffb02030,0 0 8px #ffb020;animation:pl 2s ease-in-out infinite}
+@keyframes pl{50%{box-shadow:0 0 0 5px #ffb02018,0 0 12px #ffb020;transform:scale(1.15)}}
+.grp{font:11px ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--mut);margin:6px 12px 8px}
+.nav{padding:10px 14px;border-radius:999px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--mut);margin-bottom:2px;transition:background .15s,color .15s}
+.nav:hover{color:var(--txt)}.nav.on{background:var(--hl);color:var(--txt);font-weight:600}
+.sp{flex:1}.conn{background:var(--card);border-radius:16px;padding:10px 14px;font-size:12px;color:var(--mut);margin-bottom:8px;box-shadow:var(--sh)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px}
+#wrap{flex:1;display:flex;flex-direction:column;min-width:0}
+#top{height:68px;display:flex;align-items:center;padding:0 36px;gap:16px;flex-shrink:0}
+#crumb{flex:1;font:11px ui-monospace,Menlo,monospace;letter-spacing:.12em;color:var(--mut)}
+#top small{display:block;font-size:10px;color:var(--mut);line-height:1.2}#top b{font-size:12px}
+.btn{border:1px solid var(--bd);background:var(--card);border-radius:999px;padding:7px 18px;cursor:pointer;font-weight:500;font-size:13px;transition:background .15s,transform .1s}
+.btn:hover{background:var(--sel)}.btn:active{transform:scale(.97)}
+.btn.p{background:var(--pri);border-color:var(--pri);color:var(--on)}.btn.p:hover{opacity:.88;background:var(--pri)}
+.btn.sm{height:22px;padding:0 12px;font-size:12px;font-weight:400;line-height:20px;box-sizing:border-box}
+.tabs.sm{margin:0;padding:3px;gap:2px}.tabs.sm .tab{padding:3px 12px;font-size:12px}
+.dz{border:1.5px dashed var(--bd);border-radius:18px;padding:14px;transition:background .15s,border-color .15s}.dz.over{border-color:var(--pri);background:var(--sel)}
+.dzt{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--mut);font-size:13px;margin-bottom:12px}
+.lw{overflow-x:auto}.lt th,.lt td{padding:10px 8px;font-size:13px}.lt td:first-child,.lt th:first-child{width:44px;text-align:center;color:var(--mut)}
+
+.lt .tb{width:56px;height:56px;border:1.5px dashed var(--bd);border-radius:10px;display:grid;place-items:center;overflow:hidden;cursor:pointer;background:var(--card);color:var(--mut);font-size:20px}.lt .tb img{width:100%;height:100%;object-fit:cover}
+.lt textarea.inp{min-height:56px}.warn{color:var(--bad);font-weight:500;font-size:12px}
+.btn.d{color:var(--bad);background:transparent}.btn.d:hover{background:var(--sel)}.btn:disabled{opacity:.4;cursor:not-allowed}
+#main{flex:1;overflow:auto;padding:8px 36px 40px}.page{display:none;max-width:1080px;margin:0 auto}.page.on{display:block}
+.eye{font:11px ui-monospace,Menlo,monospace;letter-spacing:.16em;color:var(--mut);margin-bottom:6px}
+h2{margin:0;font-size:34px;line-height:1.2;letter-spacing:-.01em}.lead{color:var(--mut);margin:6px 0 0;max-width:46ch}
+.hd{display:flex;align-items:flex-end;justify-content:space-between;margin:10px 0 26px;gap:12px}.hd small{color:var(--mut);font-size:13px;margin-left:8px;font-weight:400}
+.box{background:var(--card);border-radius:24px;overflow:hidden;margin-bottom:18px;box-shadow:var(--sh);border:1px solid var(--bd)}
+.note{padding:14px 24px;background:var(--in);color:var(--mut);font-size:13px}
+table{width:100%;border-collapse:collapse}th{font-weight:500;color:var(--mut);font-size:12px;text-align:left;padding:14px 24px 8px}
+td{padding:16px 24px;border-top:1px solid var(--bd);vertical-align:middle}
+.sub{font:11px ui-monospace,Menlo,monospace;color:var(--mut)}
+.st{font-size:13px;background:var(--in);border-radius:999px;padding:3px 12px 3px 10px;display:inline-block}.st:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px}
+.ok,.done{color:var(--ok)}.need_login,.failed{color:var(--bad)}.running{color:var(--ok)}.pending{color:var(--mut)}
+.bar{height:6px;border-radius:3px;background:var(--in);width:96px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri);border-radius:3px}
+.tabs{display:flex;gap:6px;background:var(--in);border-radius:999px;padding:5px;margin:10px 0 22px;flex-wrap:wrap;width:max-content;max-width:100%}
+.tab{padding:8px 20px;border-radius:999px;cursor:pointer;color:var(--mut);font-weight:500;transition:background .15s}.tab:hover{color:var(--txt)}.tab.on{background:var(--hl);color:var(--txt);font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+.sec{padding:24px 28px;border-top:1px solid var(--bd)}.sec:first-child{border:0}.sec h4{margin:0 0 10px;font-size:15px}
+.inp{width:100%;border:1px solid transparent;background:var(--in);border-radius:14px;padding:11px 14px;outline:0;transition:border-color .15s}.inp:focus{border-color:var(--pri)}textarea.inp{resize:vertical}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:14px}
+.slot{border-radius:18px;padding:12px;background:var(--in)}
+.slot .im{height:150px;border:1.5px dashed var(--bd);border-radius:12px;display:grid;place-items:center;overflow:hidden;background:var(--card);cursor:pointer;font-size:28px;color:var(--mut)}
+.slot .im img{max-width:100%;max-height:100%}.slot .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600;font-size:13px}
+.slot textarea{margin-top:8px;height:64px;font-size:12px;background:var(--card)}
+.side-c{padding:22px}.side-c h4{margin:0 0 14px;display:flex;justify-content:space-between;align-items:center}.badge{background:var(--hl);border-radius:999px;padding:0 11px;font:12px ui-monospace,monospace}
+.empty{border:1.5px dashed var(--bd);border-radius:14px;padding:14px;color:var(--mut);margin-bottom:14px}
+.bi{display:flex;gap:8px;align-items:center;padding:7px 0;font-size:12px;border-bottom:1px solid var(--bd)}.bi:last-of-type{margin-bottom:12px}.bi img{width:28px;height:36px;object-fit:cover;border-radius:6px;background:var(--in)}.bi span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.seg{display:flex;border-radius:999px;padding:4px;background:var(--in);flex-shrink:0}.seg div{padding:5px 16px;font-size:12px;cursor:pointer;border-radius:999px;color:var(--mut)}.seg div.on{background:var(--hl);color:var(--txt);font-weight:600}
+.item{display:flex;align-items:center;gap:16px;padding:16px 24px;border-top:1px solid var(--bd)}.item:first-child{border:0}
+.th{width:54px;height:68px;border-radius:12px;object-fit:cover;background:var(--in);flex-shrink:0}
+.item .m{flex:1;min-width:0}.item .m b{font-size:15px;margin-right:8px}.item .m .sub{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:11px;border-radius:999px;padding:1px 10px;background:var(--hl);color:var(--txt)}
+.mask{position:fixed;inset:0;background:#1d2b2666;backdrop-filter:blur(6px);display:none;place-items:center;z-index:20}.mask.on{display:grid}
+.modal{background:var(--card);border-radius:28px;width:min(560px,94vw);max-height:92vh;overflow:auto;padding:28px;box-shadow:0 30px 80px -20px #0006}
+.modal h3{margin:0 0 18px;font-size:22px;display:flex;justify-content:space-between;align-items:center}
+.modal h3:before{content:"◦ ◦ ◦";font-size:14px;color:var(--mut);letter-spacing:2px;margin-right:auto;order:2;margin-left:12px}
+.cardx{background:var(--in);border-radius:18px;padding:18px;margin-bottom:14px}.cardx h5{margin:0 0 4px;font-size:15px}.cardx p{margin:2px 0 10px;color:var(--mut);font-size:12px}
+.cardx .inp{background:var(--card)}
+.tg{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:14px;padding:10px 16px;margin-top:10px}
+.sw{width:44px;height:26px;border-radius:13px;background:var(--bd);position:relative;cursor:pointer;flex-shrink:0;transition:background .15s}.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.15s}.sw.on{background:var(--pri)}.sw.on:after{left:21px}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.th2{border:1px solid var(--bd);border-radius:16px;padding:14px;cursor:pointer;font-weight:600;font-size:15px}.th2.on{outline:2px solid var(--pri);outline-offset:2px}.th2 div{display:flex;gap:6px;margin-bottom:14px}.th2 i{width:22px;height:22px;border-radius:50%;border:1px solid #8884}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:30;pointer-events:none}
+#toast div{background:var(--pri);color:var(--on);border-radius:999px;padding:9px 20px;box-shadow:var(--sh);font-size:13px}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+@media(max-width:860px){#side{width:68px}.nav span,.brand span,.grp,.conn{display:none}.cols{grid-template-columns:1fr}#main{padding:8px 16px 32px}}
+/* layout fixes */
+.modal h3:before{display:none}.modal h3 .btn{margin-left:auto}
+.st{white-space:nowrap}#crumb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{white-space:nowrap}
+.tabs{border-radius:24px}
+.cols{grid-template-columns:minmax(0,1fr) 320px}.cols>*{min-width:0}
+.hd{flex-wrap:wrap}.hd h2,.hd h4{white-space:nowrap}
+.dz{min-width:0;overflow:hidden}
+.lw{max-width:100%}
+.lw::-webkit-scrollbar,.tw::-webkit-scrollbar{height:6px}.lw::-webkit-scrollbar-thumb,.tw::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.tw{overflow-x:auto}.tw table{min-width:760px}
+.note b.t{color:var(--txt)}.note div{margin-top:3px}
+.cp{display:flex;gap:6px;flex-wrap:nowrap}
+.modal.wide{width:min(820px,94vw)}
+.at{min-width:640px}.at th{padding:6px;white-space:nowrap}.at td{padding:5px 6px;border:0}.at .inp{padding:8px 10px;border-radius:10px}
+.tip{color:var(--mut);font-size:12px;margin:0 0 12px}
+.pr{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0 14px}.pr .tabs{margin:6px 0 0;width:auto}.pr>div{min-width:0;max-width:100%}
+#p1{max-width:1400px}.lt{min-width:900px}.lt th{white-space:nowrap}.lt th,.lt td{padding:8px 6px}.lt td{border-top:1px solid var(--bd)}
+.lt td:first-child{width:36px}.lt td:nth-child(3),.lt td:nth-child(4){min-width:104px}.lt td:nth-child(5){min-width:80px}.lt td:nth-child(6){min-width:210px}.lt td:nth-child(7),.lt td:nth-child(8){min-width:66px}
+.lt .tb{width:44px;height:44px;font-size:18px}.lt textarea.inp{min-height:48px}
+.inp.s{padding:7px 9px;border-radius:10px;font-size:12px}.inp:disabled{opacity:.45}
+.slot .inp.s{background:var(--card)}.slot .row{gap:6px}.slot .im{height:130px}.slot .inp.s{margin:0}
+.pls{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.pl{font-size:11px;line-height:18px;padding:0 8px;border-radius:999px;background:var(--card);border:1px solid var(--bd);color:var(--mut);cursor:pointer;white-space:nowrap}.pl.on{background:var(--hl);color:var(--txt);border-color:transparent;font-weight:600}
+.pc{margin-left:auto;font-size:11px;color:var(--mut)}
+.sum{font-size:13px;line-height:1.7;margin:0 0 12px}.sum b{font-size:15px}
+.side-c{position:sticky;top:8px}#bl{max-height:44vh;overflow:auto}
+.bh{display:flex;align-items:center;gap:10px;padding:14px 24px;border-top:1px solid var(--bd);cursor:pointer;background:var(--in);flex-wrap:wrap}.bh:first-child{border:0}.bh:hover{background:var(--sel)}.bh b{font-size:14px}.bh .sp{flex:1}
+.chev{width:14px;color:var(--mut)}
+.item.c{padding:10px 24px 10px 40px;gap:12px}.item.c .th{width:36px;height:46px;border-radius:8px}
+.acts{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}.acts a.btn{text-decoration:none;color:inherit;display:inline-block}
+.vers{padding:0 24px 8px 92px;font-size:12px;color:var(--mut)}.vers>div{display:flex;align-items:center;gap:8px;padding:4px 0;flex-wrap:wrap}
+#vbar{display:none;background:#fff3cd;color:#8a5a00;padding:9px 36px;font-size:13px;text-align:center}
+#sbar{display:none;position:fixed;left:220px;right:0;bottom:0;z-index:15;padding:12px 36px;background:var(--card);border-top:1px solid var(--bd);box-shadow:0 -8px 24px -16px #0003;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+@media(max-width:1180px){.cols{grid-template-columns:minmax(0,1fr)}.side-c{position:static}#sbar{display:flex}#p1{padding-bottom:72px}}
+@media(max-width:860px){#sbar{left:68px;padding:12px 16px}.sec{padding:18px 16px}#top{padding:0 16px}.hd h2{font-size:28px}td{padding:14px 12px}}
+.pair{display:flex;gap:6px}.tbw{display:flex;flex-direction:column;align-items:center;gap:2px}.tb{position:relative}.im{position:relative}
+.lb{font-style:normal;font-size:10px;color:var(--mut);line-height:1}
+.tb .x,.im .x{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--card);border:1px solid var(--bd);color:var(--mut);font-size:9px;line-height:14px;text-align:center;display:none;cursor:pointer;font-weight:400}
+.tb:hover .x,.im:hover .x{display:block}
+.hint{font-size:10px;color:var(--mut);margin-top:3px;line-height:1.3}
+.pair2{display:flex;gap:6px}.pair2 .tbw{flex:1;align-items:stretch;min-width:0}.pair2 .im{height:110px}.cap{margin:4px 0 0;word-break:break-all;font-size:10px}
+.lt td:nth-child(2){min-width:108px}
+</style></head><body data-t="light">
+<div id="side">
+ <div class="brand"><i>F</i><span><b><em class="f">F</em><em class="f">l</em><em class="f">o</em><em class="f">w</em><em>&nbsp;</em><em class="r">R</em><em class="r">u</em><em class="r">n</em><em class="r">n</em><em class="r">e</em><em class="r">r</em></b><small>本地任务调度</small></span></div>
+ <div class="grp">工作区</div>
+ <div class="nav on" data-p="0" onclick="tab(0)">▤ <span>账号池</span></div>
+ <div class="nav" data-p="1" onclick="tab(1)">＋ <span>创建任务</span></div>
+ <div class="nav" data-p="2" onclick="tab(2)">☰ <span>任务队列</span></div>
+ <div class="sp"></div>
+ <div class="conn" id="conn"><span class="dot"></span><span id="connt">服务已连接</span></div>
+ <div class="nav" onclick="openSet()">⚙ <span>设置</span></div>
+</div>
+<div id="wrap">
+ <div id="vbar"></div>
+ <div id="top"><div id="crumb">FLOW / 账号池</div><div><small>调度器</small><b><span class="dot" style="margin-right:5px"></span>运行中</b></div><button class="btn" onclick="lockNow()">🔒 锁定</button><button class="btn p" onclick="tab(1)">＋ 新建任务</button></div>
+ <div id="main">
+
+ <div class="page on" id="p0">
+  <div class="hd"><div><div class="eye">ACCOUNTS</div><h2>账号池 <small id="sum"></small></h2><p class="lead">登录一次，之后自动轮流使用，点数用完就换下一个。</p></div><div><button class="btn" onclick="load()">⟳ 刷新</button> <button class="btn p" onclick="openAdd()">＋ 添加账号</button></div></div>
+  <div class="box">
+  <div class="tw"><table><thead><tr><th>账号</th><th>状态</th><th>今日点数</th><th>登录信息（点击复制）</th><th>操作</th></tr></thead><tbody id="acc"></tbody></table></div></div>
+ </div>
+
+ <div class="page" id="p1">
+  <div class="hd" style="margin-bottom:6px"><div><div class="eye">CREATE</div><h2>创建任务</h2><p class="lead">选好模型和画面比例，粘贴分镜表格，放入图片，一次提交一批。</p></div></div>
+  <div class="pr"><div><div class="sub">模型</div><div class="tabs" id="models"></div></div><div><div class="sub">画面比例</div><div class="tabs" id="ratios"></div></div></div>
+  <div class="sub" id="mhint" style="margin:-4px 0 16px"></div>
+  <div class="cols">
+   <div class="box">
+    <div class="sec"><div class="hd" style="margin:0 0 8px;align-items:center"><h4 style="margin:0;line-height:22px">媒体输入</h4><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="tabs sm" id="mvm"></div><button class="btn sm" onclick="pasteSheet()">粘贴表格</button><button class="btn sm" onclick="resetRows()">清空全部输入</button></div></div>
+     <div class="tip">在表格里复制「素材图/首帧图片名、尾帧图片名、分镜片段名称、分镜提示词、素材/帧模式、秒数」六列，点「粘贴表格」，或点任意一格直接粘贴。图片和整个文件夹都可以直接拖进下面，按文件名序号自动对应：01.png 是首帧，01_2.png 是尾帧。</div>
+     <div class="dz" id="mdz" ondragover="dOver(event)" ondragleave="dLeave(event)" ondrop="dDrop(event)">
+      <div class="dzt"><span>把图片或整个文件夹拖到这里，或</span><button class="btn sm" onclick="mpick.click()">选择图片</button><button class="btn sm" onclick="mdir.click()">加载文件夹</button><button class="btn sm" onclick="addRow()">＋ 添加一行</button><span id="libn"></span></div>
+      <input id="mpick" type="file" accept="image/*" multiple hidden onchange="addFiles(this.files);this.value=''">
+      <input id="mdir" type="file" webkitdirectory multiple hidden onchange="addFiles(this.files);this.value=''">
+      <input id="mone" type="file" accept="image/*" hidden onchange="addFiles(this.files,tgt,tgtSlot);this.value=''">
+      <div id="slots"></div></div></div>
+   </div>
+   <div class="box side-c"><h4>制作批次 <span class="badge" id="bc">0</span></h4><div class="sum" id="psum"></div><div id="bl"></div><button class="btn p" style="width:100%" id="sub" onclick="submitRows()">提交任务</button></div>
+  </div>
+  <div id="sbar"><span id="sbt"></span><button class="btn p" id="sub2" onclick="submitRows()">提交任务</button></div>
+ </div>
+
+ <div class="page" id="p2">
+  <div class="hd"><div><div class="eye">QUEUE</div><h2>任务队列 <small id="tsum"></small></h2><p class="lead">提交后的任务按批次分组，完成时会提醒你。</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="post('/api/tasks/retry_failed')">重试失败任务</button><button class="btn d" style="border-color:var(--bd)" onclick="clearDone()">清空已结束</button></div></div>
+  <div class="box"><div class="item" style="gap:12px;padding:18px 24px"><input class="inp" id="q" placeholder="搜索片段名称、图片名、任务编号或提示词" oninput="load()"><div class="seg" id="seg"></div></div><div id="tasks"></div></div>
+ </div>
+ </div>
+</div>
+
+<div class="mask" id="addM"><div class="modal wide"><h3>添加账号 <button class="btn" onclick="addM.classList.remove('on')">✕</button></h3>
+ <p class="tip">可以直接从 Excel / 表格里复制「账号、密码、二步验证密钥」几列，点任意一格粘贴。密码和二步验证密钥都可以不填，账号没有二步验证就留空。账号已存在时，会更新填写了的内容。每日点数不填默认 50。</p>
+ <div class="tw"><table class="at"><thead><tr><th>账号</th><th>密码</th><th>二步验证密钥（选填）</th><th>每日点数</th><th></th></tr></thead><tbody id="arows"></tbody></table></div>
+ <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn" onclick="addARow()">＋ 添加一行</button><button class="btn p" onclick="addAcc()">保存账号</button></div></div></div>
+
+<div class="mask" id="setM"><div class="modal"><h3>应用设置 <button class="btn" onclick="setM.classList.remove('on')">✕</button></h3>
+ <div class="cardx"><h5>📂 下载目录</h5><p>新提交的批次保存到此目录；已提交的批次保留原目录。输入后按回车或点空白处保存。</p><input class="inp" id="dir" placeholder="/Users/xxx/Downloads/FlowRunner" onchange="saveDir(this.value)"></div>
+ <div class="cardx"><h5>文件命名</h5><p>视频按「片段名称」保存，如 01-1.mp4，放在下载目录的当天日期文件夹里；同一天遇到重名，整批放进新文件夹（日期_2）。重生的版本是 01-1-1、01-1-2。</p></div>
+ <div class="cardx"><h5>完成与失败提示</h5><p>顶部小提示不会阻塞操作，到时间后自动消失。</p><select class="inp" id="tt" onchange="cfg.tt=+this.value;save()"><option value="3">3 秒</option><option value="5">5 秒</option><option value="10">10 秒</option></select>
+  <div class="tg"><div><b>成功 / 失败提示音</b><div class="sub">任务状态变化时播放简短提示音</div></div><div class="sw" id="snd" onclick="cfg.snd=!cfg.snd;save();ui()"></div></div></div>
+ <div class="cardx"><h5>🔒 账号池主密码</h5><p>主密码用来加密账号池里的 Google 密码和二步验证密钥，每次启动 / 打开新标签页都要先输入。忘记主密码后，已存的账号密码将无法解密，只能删库重填，请记在密码管理器里。</p><button class="btn" onclick="setM.classList.remove('on');showLock('change')">修改主密码</button> <button class="btn" onclick="lockNow()">立即锁定</button></div>
+ <div class="cardx"><h5>主题颜色</h5><div class="themes" id="themes"></div></div>
+ <div style="text-align:right"><button class="btn p" onclick="setM.classList.remove('on')">完成</button></div></div></div>
+<div id="toast"></div>
+<div class="mask on" id="lockM"><div class="modal"><h3 id="lkTitle">账号池已锁定</h3>
+ <p class="tip" id="lkHint">输入主密码解锁后，才能进入账号池。</p>
+ <div id="lkOldRow" style="display:none;margin-bottom:10px"><input class="inp" id="lkOld" type="password" autocomplete="current-password" placeholder="旧主密码"></div>
+ <input class="inp" id="lkPw" type="password" autocomplete="new-password" placeholder="主密码（至少 8 位）" onkeydown="if(event.key=='Enter')doLock()">
+ <div id="lkPw2Row" style="display:none;margin-top:10px"><input class="inp" id="lkPw2" type="password" autocomplete="new-password" placeholder="再输入一次主密码" onkeydown="if(event.key=='Enter')doLock()"></div>
+ <div class="warn" id="lkErr" style="margin-top:10px"></div>
+ <div style="display:flex;justify-content:space-between;gap:8px;margin-top:16px"><span class="sub" id="lkFoot">主密码只存在你脑子里，程序不保存它；忘记后已存账号密码无法找回。</span><button class="btn p" id="lkBtn" onclick="doLock()">解锁</button></div></div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+/* 主密码锁：会话令牌只放 sessionStorage（关掉标签页即失效），每次
+   fetch 自动带上；预览/下载链接是 <a>/<img> 发出的，令牌改放查询参数。 */
+const lockToken=()=>sessionStorage.getItem('flow_unlock_token')||'';
+const tokQ=()=>lockToken()?('&unlock_token='+encodeURIComponent(lockToken())):'';
+const _fetch=window.fetch.bind(window);
+window.fetch=(u,o={})=>{const t=lockToken();if(t&&String(u).startsWith('/api/')){o={...o,headers:{...(o.headers||{}),'X-Flow-Unlock':t}}}return _fetch(u,o)};
+let LKMode='unlock';
+function showLock(mode){LKMode=mode;
+ lkTitle.textContent=mode=='setup'?'设置账号池主密码':mode=='change'?'修改主密码':'账号池已锁定';
+ lkHint.textContent=mode=='setup'?'第一次使用：先设定一个主密码（至少 8 位），以后每次打开都要先输入它才能进入账号池。':mode=='change'?'输入旧主密码和新主密码（至少 8 位），全部账号密码会用新主密码重新加密。':'输入主密码解锁后，才能进入账号池。';
+ lkOldRow.style.display=mode=='change'?'block':'none';
+ lkPw2Row.style.display=mode=='setup'||mode=='change'?'block':'none';
+ lkPw.placeholder=mode=='change'?'新主密码（至少 8 位）':'主密码（至少 8 位）';
+ lkBtn.textContent=mode=='setup'?'设置并进入':mode=='change'?'修改主密码':'解锁';
+ lkErr.textContent='';lkPw.value='';lkPw2.value='';if($('lkOld'))lkOld.value='';
+ lockM.classList.add('on');setTimeout(()=>lkPw.focus(),50)}
+function hideLock(){lockM.classList.remove('on')}
+async function refreshMeta(){try{const m=await (await fetch('/api/meta')).json();COST=m.cost;SET=await (await fetch('/api/settings')).json();ui()}catch(e){}}
+async function checkLock(){
+ try{const s=await (await fetch('/api/lock/status')).json();
+  if(s.locked){showLock(s.has_master?'unlock':'setup');return false}
+  if(!lockToken()){showLock('unlock');return false}
+  await refreshMeta();hideLock();return true}catch(e){return false}}
+async function doLock(){
+ const pw=lkPw.value,err=m=>{lkErr.textContent=m};
+ if(LKMode=='setup'){
+  if(pw.length<8)return err('主密码至少 8 位');
+  if(pw!==lkPw2.value)return err('两次输入的主密码不一致');
+  try{const d=await api('/api/lock/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,confirm:lkPw2.value})});
+   sessionStorage.setItem('flow_unlock_token',d.token);hideLock();toast('主密码已设置');await refreshMeta();load()}
+  catch(e){err(e.message)}}
+ else if(LKMode=='change'){
+  if(pw.length<8)return err('新主密码至少 8 位');
+  if(pw!==lkPw2.value)return err('两次输入的新主密码不一致');
+  try{const d=await api('/api/lock/change',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old_password:lkOld.value,new_password:pw,confirm:lkPw2.value})});
+   sessionStorage.setItem('flow_unlock_token',d.token);hideLock();toast('主密码已修改')}
+  catch(e){err(e.message)}}
+ else{
+  if(!pw)return err('请输入主密码');
+  try{const d=await api('/api/lock/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+   sessionStorage.setItem('flow_unlock_token',d.token);hideLock();await refreshMeta();load()}
+  catch(e){err(e.message)}}}
+async function lockNow(){
+ try{await api('/api/lock/lock',{method:'POST'})}catch(e){}
+ sessionStorage.removeItem('flow_unlock_token');showLock('unlock')}
+async function api(u,o){let r;try{r=await fetch(u,o)}catch(e){throw new Error('无法连接后台服务，请确认软件正在运行')}
+ if(r.status==423){showLock('unlock');throw new Error('账号池未解锁，请先输入主密码')}
+ if(!r.ok){let d='';try{const j=await r.json();d=typeof j.detail=='string'?j.detail:JSON.stringify(j.detail||j)}catch(e){}
+  throw new Error(r.status==404&&d=='Not Found'?'接口不存在（404），可能是后台服务版本过旧，请重启软件':`请求失败（${r.status}）${d?'：'+d:''}`)}
+ return r.json().catch(()=>({}))}
+const post=(u,b)=>api(u,{method:'POST',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):null}).then(load).catch(e=>toast(e.message));
+function bar(m){vbar.textContent=m||'';vbar.style.display=m?'block':'none';connt.textContent=m?'服务未连接':'服务已连接';conn.firstChild.style.background=m?'#d9534f':''}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#x27;'}[c]));
+const TL={ok:'可用',need_login:'需登录'},SL={pending:'排队中',running:'进行中',done:'已完成',failed:'失败'};
+const MODELS=['Omni 1.1 Flash','Veo 3.1 - Lite','Veo 3.1 - Fast','Veo 3.1 - Quality'];
+let COST={'Omni 1.1 Flash':{4:7,6:10,8:12,10:15},'Veo 3.1 - Lite':{8:10},'Veo 3.1 - Fast':{8:20},'Veo 3.1 - Quality':{8:100}},SET={}; /* 启动时用 /api/meta 覆盖，以 app.py 的 COST 为准 */
+const CRUMB=['账号池','创建任务','任务队列'];
+const THEMES=[['light','专业亮色'],['dark','专业暗色'],['soft','柔和护眼'],['black','深黑专注']];
+let cfg=Object.assign({tt:5,snd:true,theme:'light',model:0,ratio:'9:16',vm:'list'},JSON.parse(localStorage.getItem('flowcfg')||'{}'));
+let R=[newRow(),newRow(),newRow()],tgt=null,tgtSlot='head',F='all',prevS=null,TK=[],ACC=[],AR=[];
+function save(){localStorage.setItem('flowcfg',JSON.stringify(cfg))}
+function tab(i){document.querySelectorAll('.page').forEach((p,n)=>p.classList.toggle('on',n==i));document.querySelectorAll('.nav[data-p]').forEach(n=>n.classList.toggle('on',n.dataset.p==i));$('crumb').textContent='FLOW / '+CRUMB[i]}
+function toast(t){const d=document.createElement('div');d.textContent=t;$('toast').appendChild(d);setTimeout(()=>d.remove(),cfg.tt*1000)}
+function beep(ok){if(!cfg.snd)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?880:260;g.gain.value=.08;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.15)}catch(e){}}
+/* settings */
+function openSet(){setM.classList.add('on');ui()}
+function saveDir(v){SET.download_dir=v;fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({download_dir:v})}).then(()=>toast('下载目录已保存'))}
+function ui(){document.body.dataset.t=cfg.theme;dir.value=SET.download_dir||'';tt.value=cfg.tt;snd.classList.toggle('on',cfg.snd);
+ themes.innerHTML=THEMES.map(([k,n])=>`<div class="th2 ${cfg.theme==k?'on':''}" data-t="${k}" onclick="cfg.theme='${k}';save();ui()" style="background:${{light:'#ffffff;color:#1d2b26',dark:'#1a221f;color:#e6f0ec',soft:'#ffffff;color:#26322a',black:'#141917;color:#e4ede9'}[k]}"><div><i style="background:${{light:'#fdfefd',dark:'#121816',soft:'#f6f9ef',black:'#0c0f0d'}[k]}"></i><i style="background:${{light:'#fff3a6',dark:'#4a4521',soft:'#fbf1a0',black:'#4a4521'}[k]}"></i><i style="background:${{light:'#25986b',dark:'#6fe0b4',soft:'#2f8f6b',black:'#8ff0c8'}[k]}"></i></div>${n}</div>`).join('')}
+/* accounts */
+const KEYS=['name','pw','totp','lim'];
+function newARow(){return{name:'',pw:'',totp:'',lim:''}}
+function openAdd(){if(!AR.length)AR=[newARow(),newARow(),newARow()];renderAR();addM.classList.add('on')}
+function renderAR(){arows.innerHTML=AR.map((r,i)=>`<tr>
+ <td><input class="inp" autocomplete="off" placeholder="name@gmail.com" value="${esc(r.name)}" oninput="AR[${i}].name=this.value" onpaste="pasteAR(event,${i},0)"></td>
+ <td><input class="inp" type="password" autocomplete="new-password" placeholder="密码" value="${esc(r.pw)}" oninput="AR[${i}].pw=this.value" onpaste="pasteAR(event,${i},1)"></td>
+ <td><input class="inp" autocomplete="off" placeholder="没有可不填" value="${esc(r.totp)}" oninput="AR[${i}].totp=this.value" onpaste="pasteAR(event,${i},2)"></td>
+ <td><input class="inp" inputmode="numeric" style="width:84px" placeholder="50" value="${esc(r.lim)}" oninput="AR[${i}].lim=this.value" onpaste="pasteAR(event,${i},3)"></td>
+ <td><button class="btn d sm" onclick="delARow(${i})">删</button></td></tr>`).join('')}
+function addARow(){AR.push(newARow());renderAR()}
+function delARow(i){AR.splice(i,1);if(!AR.length)AR.push(newARow());renderAR()}
+function pasteAR(e,i,c){const t=(e.clipboardData||window.clipboardData).getData('text');
+ if(!/[\t\n]/.test(t.trim()))return;e.preventDefault();  /* 单个值照常粘贴，多格才按表格拆分 */
+ t.replace(/\r/g,'').split('\n').filter(l=>l.trim()!=='').forEach((l,k)=>{while(AR.length<=i+k)AR.push(newARow());
+  l.split('\t').forEach((v,j)=>{if(c+j<4)AR[i+k][KEYS[c+j]]=v.trim()})});
+ renderAR()}
+async function addAcc(){
+ const items=AR.filter(r=>r.name.trim()).map(r=>({name:r.name.trim(),password:r.pw,totp:r.totp.trim(),daily_limit:parseInt(r.lim)||0}));
+ if(!items.length){toast('请至少填一个账号');return}
+ try{const d=await api('/api/accounts/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})});
+  AR=[];addM.classList.remove('on');
+  toast(`新增 ${d.added} 个，更新 ${d.updated} 个${d.bad?`，${d.bad} 个账号名无效（不能含 / \\ : * ? " < > |）`:''}`);load()
+ }catch(e){toast('保存失败：'+e.message)}}
+async function cp(id,kind){
+ try{let v,left;
+  if(kind=='name')v=ACC.find(x=>x.id==id).name;
+  else{
+   for(let k=0;k<2;k++){
+    const r=await fetch(`/api/accounts/${id}/secret/${kind}`);
+    if(!r.ok){toast((await r.json()).detail||'获取失败');return}
+    const d=await r.json();v=d.value;left=d.left;
+    if(kind=='totp'&&left<=2&&k==0){toast('验证码马上刷新，稍等一下…');await new Promise(o=>setTimeout(o,(left+1)*1000));continue}
+    break}}
+  await navigator.clipboard.writeText(v);
+  toast(kind=='totp'?`验证码 ${v} 已复制（${left} 秒内有效）`:kind=='password'?'密码已复制':'账号已复制')
+ }catch(e){toast('复制失败，请检查浏览器的剪贴板权限')}}
+async function clearDone(){
+ if(!TK.some(x=>x.status=='done'||x.status=='failed')){toast('没有可清空的任务');return}
+ if(!confirm('清空所有「已完成」和「失败」的任务记录？\n已下载的视频文件不会被删除，排队中和进行中的任务会保留。'))return;
+ try{const r=await api('/api/tasks/clear_finished',{method:'POST'});toast(`已清空 ${r.deleted} 条`);load()}catch(e){toast('清空失败：'+e.message)}}
+/* create task */
+const SECS=[4,6,8,10],COLS=['img','tail','clip','prompt','mode','sec'];
+let LIB=[],URLS=new WeakMap();
+const isOmni=()=>cfg.model==0;
+const effSec=r=>isOmni()?r.sec:8;
+const costOf=r=>{const o=COST[MODELS[cfg.model]]||{};return o[effSec(r)]||Object.values(o)[0]||0};
+const DC=()=>(COST[MODELS[0]]||{})[10]||15;
+function newRow(){return{img:'',tail:'',clip:'',prompt:'',mode:'asset',sec:10}}
+const isEmptyRow=r=>!r.img.trim()&&!r.tail.trim()&&!r.clip.trim()&&!r.prompt.trim();
+const urlOf=f=>{if(!f)return'';let u=URLS.get(f);if(!u){u=URL.createObjectURL(f);URLS.set(f,u)}return u};
+const stem=n=>String(n||'').trim().replace(/\.[^.\\/]+$/,'').toLowerCase();
+function parseImg(name){const st=String(name).replace(/\.[^.\\/]+$/,''),m=st.match(/^(\d+)/);return{num:m?+m[1]:null,role:/^\d+[_-]2(?!\d)/.test(st)?'tail':'head'}}  /* 01_2 = 01 号的尾帧 */
+function fileOf(name,role){name=String(name||'').trim();if(!name)return null;const low=name.toLowerCase(),s=stem(name),num=/^\d+$/.test(s)?+s:null;
+ const byNum=r=>LIB.find(x=>{const p=parseImg(x.name);return p.num===num&&p.role==r});
+ let f;if(num!=null&&role=='tail'&&(f=byNum('tail')))return f;  /* 尾帧列只写数字：优先找 01_2 */
+ f=LIB.find(x=>x.name.toLowerCase()==low);if(f)return f;
+ f=LIB.find(x=>stem(x.name)==s);if(f)return f;
+ if(num!=null)f=byNum(role||'head');
+ return f||null}
+function baseOf(img){const st=String(img).trim().replace(/\.[^.\\/]+$/,''),m=st.match(/^\d+/);return m?String(+m[0]).padStart(2,'0'):st}
+function clipNames(){const used=new Set(R.map(r=>r.clip.trim()).filter(Boolean)),cnt={};
+ return R.map(r=>{if(r.clip.trim())return r.clip.trim();if(!r.img.trim())return'';
+  const b=baseOf(r.img);let k=(cnt[b]||0)+1;while(used.has(`${b}-${k}`))k++;cnt[b]=k;const n=`${b}-${k}`;used.add(n);return n})}
+function renderModels(){
+ models.innerHTML=MODELS.map((m,i)=>`<div class="tab ${cfg.model==i?'on':''}" onclick="cfg.model=${i};save();renderModels();renderRows()">${m}</div>`).join('');
+ ratios.innerHTML=['16:9','9:16'].map(v=>`<div class="tab ${cfg.ratio==v?'on':''}" onclick="cfg.ratio='${v}';save();renderModels()">${v}</div>`).join('');
+ mhint.textContent=isOmni()?'Omni 1.1 Flash · 720p · 秒数在每一行里选（默认 10 秒）':`${MODELS[cfg.model]} · 固定 720p · 8 秒，每个 ${costOf({sec:8})} 点`}
+function resetRows(){LIB.forEach(f=>{const u=URLS.get(f);u&&URL.revokeObjectURL(u)});LIB=[];R=[newRow(),newRow(),newRow()];renderRows()}
+function addRow(){R.push(newRow());renderRows()}
+function delRow(i){R.splice(i,1);if(!R.length)R.push(newRow());renderRows()}
+function pickOne(i,slot){tgt=i;tgtSlot=slot||'head';mone.click()}
+const isImg=f=>/^image\//.test(f.type)||/\.(png|jpe?g|webp|gif|bmp)$/i.test(f.name);
+function addFiles(fs,at,slot){const key=f=>{const p=parseImg(f.name);return[p.num==null?1e9:p.num,p.role=='tail'?1:0]};
+ const L=[...fs].filter(isImg).sort((a,b)=>{const x=key(a),y=key(b);return x[0]-y[0]||x[1]-y[1]||a.name.localeCompare(b.name,undefined,{numeric:true})});
+ if(!L.length){toast('没有可用的图片');return}
+ L.forEach(f=>{const k=LIB.findIndex(x=>x.name==f.name);if(k>=0)LIB[k]=f;else LIB.push(f)});
+ if(at!=null&&R[at]){  /* 放到某一行的格子里；两张一起放进首帧格：首帧在前、尾帧在后 */
+  if(slot=='tail')R[at].tail=L[0].name;else{R[at].img=L[0].name;if(L[1])R[at].tail=L[1].name}
+ }else{
+  const rest=[],used=f=>R.some(r=>fileOf(r.img)===f||fileOf(r.tail,'tail')===f);
+  for(const f of L){if(used(f))continue;const p=parseImg(f.name);
+   if(p.role=='tail'&&p.num!=null){  /* 尾帧：补给所有用这张首帧图、还没填尾帧的行；没有就按序号放到对应行 */
+    const rows=R.filter(r=>!r.tail&&r.img&&(x=>x&&parseImg(x.name).num===p.num)(fileOf(r.img)));
+    if(rows.length)rows.forEach(r=>r.tail=f.name);
+    else if(p.num>=1&&p.num<=500){while(R.length<p.num)R.push(newRow());if(!R[p.num-1].tail)R[p.num-1].tail=f.name}}
+   else if(p.num>=1&&p.num<=500){while(R.length<p.num)R.push(newRow());if(!R[p.num-1].img)R[p.num-1].img=f.name}  /* 按序号填到对应行 */
+   else if(p.num==null)rest.push(f)}
+  for(const f of rest){let i=R.findIndex(r=>!r.img);if(i<0){R.push(newRow());i=R.length-1}R[i].img=f.name}}
+ renderRows();const h=R.filter(r=>r.img&&fileOf(r.img)).length,t=R.filter(r=>r.tail&&fileOf(r.tail,'tail')).length;
+ toast(`已加载 ${L.length} 张图片，表格里匹配到首帧 ${h} 行${t?`、尾帧 ${t} 行`:''}`)}
+async function filesFromDrop(dt){  /* 支持直接拖文件夹（含子文件夹） */
+ const out=[],ents=[];
+ for(const it of [...(dt.items||[])]){const en=it.webkitGetAsEntry&&it.webkitGetAsEntry();if(en)ents.push(en);else{const f=it.getAsFile&&it.getAsFile();if(f)out.push(f)}}
+ const walk=async en=>{if(en.isFile)await new Promise(r=>en.file(f=>{out.push(f);r()},r));
+  else if(en.isDirectory){const rd=en.createReader();let all=[];for(;;){const b=await new Promise(r=>rd.readEntries(r,()=>r([])));if(!b.length)break;all=all.concat(b)}for(const c of all)await walk(c)}};
+ for(const en of ents)await walk(en);
+ return out.length?out:[...(dt.files||[])]}
+function dOver(e){e.preventDefault();mdz.classList.add('over')}
+function dLeave(e){if(!mdz.contains(e.relatedTarget))mdz.classList.remove('over')}
+function dDrop(e,at,slot){e.preventDefault();e.stopPropagation();mdz.classList.remove('over');filesFromDrop(e.dataTransfer).then(fs=>addFiles(fs,at,slot))}
+function setV(i,k,v){R[i][k]=v;if(k=='img'||k=='tail'){const sl=k=='tail'?'tail':'head',el=$('tb'+sl[0]+i);if(el)el.innerHTML=cellIn(i,sl,k=='tail'?fileOf(v,'tail'):fileOf(v))}stat()}
+function setMode(i,v){R[i].mode=v;renderRows()}
+function setSec(i,v){R[i].sec=v;renderRows()}
+/* 粘贴表格：支持带引号、带换行的单元格 */
+function parseTSV(t){const rows=[];let row=[],cell='',q=false;t=t.replace(/\r\n?/g,'\n');
+ for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch=='"'){if(t[i+1]=='"'){cell+='"';i++}else q=false}else cell+=ch}
+  else if(ch=='"'&&cell==='')q=true;
+  else if(ch=='\t'){row.push(cell);cell=''}
+  else if(ch=='\n'){row.push(cell);rows.push(row);row=[];cell=''}
+  else cell+=ch}
+ if(cell!==''||row.length){row.push(cell);rows.push(row)}
+ return rows.filter(r=>r.some(c=>c.trim()!==''))}
+function setCell(r,key,v){v=v.trim();
+ if(key=='mode')r.mode=/帧|frame/i.test(v)?'frame':'asset';
+ else if(key=='sec'){const n=parseInt(v);r.sec=SECS.includes(n)?n:10}
+ else r[key]=v}
+function fillFrom(i,c,m){
+ if(m.length&&m[0].filter(x=>x.trim().length<=14&&/提示词|图片名|片段名称|帧模式|秒数/.test(x)).length>=2)m.shift();  /* 第一行是表头就跳过 */
+ if(!m.length){toast('没有可粘贴的内容');return}
+ m.forEach((cells,k)=>{while(R.length<=i+k)R.push(newRow());cells.forEach((v,j)=>{const key=COLS[c+j];if(key)setCell(R[i+k],key,v)})});
+ renderRows();toast(`已粘贴 ${m.length} 行`)}
+function onPaste(e){const el=e.target;if(el.dataset.i==null)return;
+ const t=(e.clipboardData||window.clipboardData).getData('text'),c=+el.dataset.c;
+ if(!/\t/.test(t)&&!(/\n/.test(t.trim())&&c!=3))return;  /* 单个值、或提示词里的普通换行：照常粘贴 */
+ e.preventDefault();fillFrom(+el.dataset.i,c,parseTSV(t))}
+async function pasteSheet(){try{const t=await navigator.clipboard.readText();if(!t.trim()){toast('剪贴板是空的');return}
+ let i=R.length;while(i>0&&isEmptyRow(R[i-1]))i--;fillFrom(i,0,parseTSV(t))}catch(e){toast('读取剪贴板失败，请点任意一格直接粘贴')}}
+const cellIn=(i,slot,f)=>f?`<img src="${urlOf(f)}"><b class="x" onclick="event.stopPropagation();clearCell(${i},'${slot}')">✕</b>`:'＋';
+const cellBox=(i,slot,f,cls)=>`<div class="${cls}" id="tb${slot[0]}${i}" title="${slot=='tail'?'尾帧':'首帧'}" onclick="pickOne(${i},'${slot}')" ondragover="dOver(event)" ondrop="dDrop(event,${i},'${slot}')">${cellIn(i,slot,f)}</div>`;
+function clearCell(i,slot){R[i][slot=='tail'?'tail':'img']='';renderRows()}
+function renderRows(){
+ mvm.innerHTML=[['list','列表'],['thumb','缩略图']].map(([k,l])=>`<div class="tab ${cfg.vm==k?'on':''}" onclick="cfg.vm='${k}';save();renderRows()">${l}</div>`).join('');
+ libn.textContent=LIB.length?`已加载 ${LIB.length} 张图片`:'';
+ const nm=clipNames(),hint=r=>r.mode=='asset'&&r.tail.trim()?'<div class="hint">素材模式不使用尾帧</div>':'';
+ const secSel=(r,i)=>isOmni()?`<select class="inp s" onchange="setSec(${i},+this.value)">${SECS.map(v=>`<option value="${v}" ${v==r.sec?'selected':''}>${v}</option>`).join('')}</select>`:'<span class="sub">8</span>';
+ if(cfg.vm=='thumb'){slots.className='slots';
+  slots.innerHTML=R.map((r,i)=>`<div class="slot"><div class="row"><span class="sub">${i+1}</span><input class="inp s" style="flex:1" data-i="${i}" data-c="2" data-clip="${i}" placeholder="${esc(nm[i]||'片段名称')}" value="${esc(r.clip)}" oninput="setV(${i},'clip',this.value)"><button class="btn d sm" onclick="delRow(${i})">删</button></div>
+   <div class="pair2">${['head','tail'].map(sl=>{const v=sl=='tail'?r.tail:r.img,f=sl=='tail'?fileOf(r.tail,'tail'):fileOf(r.img);return `<div class="tbw">${cellBox(i,sl,f,'im')}<div class="sub cap">${sl=='tail'?'尾帧':'首帧'}${v?'：'+esc(v)+(f?'':' <b class="warn">找不到</b>'):''}</div></div>`}).join('')}</div>${hint(r)}
+   <div class="pls"><span class="pl ${r.mode=='asset'?'on':''}" onclick="setMode(${i},'asset')">素材</span><span class="pl ${r.mode=='frame'?'on':''}" onclick="setMode(${i},'frame')">帧</span>${isOmni()?SECS.map(v=>`<span class="pl ${r.sec==v?'on':''}" onclick="setSec(${i},${v})">${v}秒</span>`).join(''):'<span class="pl on">8秒</span>'}<span class="pc">${costOf(r)} 点</span></div>
+   <textarea class="inp" rows="3" data-i="${i}" data-c="3" placeholder="提示词" oninput="setV(${i},'prompt',this.value)">${esc(r.prompt)}</textarea></div>`).join('')}
+ else{slots.className='lw';
+  slots.innerHTML=`<table class="lt"><thead><tr><th>序号</th><th>图片（首 / 尾）</th><th>素材图/首帧图片名</th><th>尾帧图片名</th><th>分镜片段名称</th><th>分镜提示词</th><th>素材/帧</th><th>秒数</th><th></th></tr></thead><tbody>${R.map((r,i)=>`<tr><td>${i+1}</td>
+   <td><div class="pair"><div class="tbw">${cellBox(i,'head',fileOf(r.img),'tb')}<i class="lb">首</i></div><div class="tbw">${cellBox(i,'tail',fileOf(r.tail,'tail'),'tb')}<i class="lb">尾</i></div></div>${hint(r)}</td>
+   <td><input class="inp s" data-i="${i}" data-c="0" placeholder="01.jpeg" value="${esc(r.img)}" oninput="setV(${i},'img',this.value)"></td>
+   <td><input class="inp s" data-i="${i}" data-c="1" placeholder="尾帧图片名" value="${esc(r.tail)}" oninput="setV(${i},'tail',this.value)"></td>
+   <td><input class="inp s" data-i="${i}" data-c="2" data-clip="${i}" placeholder="${esc(nm[i]||'自动')}" value="${esc(r.clip)}" oninput="setV(${i},'clip',this.value)"></td>
+   <td><textarea class="inp s" rows="2" data-i="${i}" data-c="3" placeholder="提示词" oninput="setV(${i},'prompt',this.value)">${esc(r.prompt)}</textarea></td>
+   <td><select class="inp s" onchange="setMode(${i},this.value)"><option value="asset" ${r.mode=='asset'?'selected':''}>素材</option><option value="frame" ${r.mode=='frame'?'selected':''}>帧</option></select></td>
+   <td>${secSel(r,i)}</td><td><button class="btn d sm" onclick="delRow(${i})">删</button></td></tr>`).join('')}</tbody></table>`}
+ stat()}
+function analyze(){const names=clipNames(),cnt={};names.forEach(n=>n&&(cnt[n]=(cnt[n]||0)+1));const ok=[],bad=[];
+ R.forEach((r,i)=>{if(isEmptyRow(r))return;const t={r,i,name:names[i]};let why='';
+  if(!r.img.trim())why='缺图片名';else if(!fileOf(r.img))why='找不到图片';else if(!r.prompt.trim())why='缺提示词';
+  else if(r.mode=='frame'&&r.tail.trim()&&!fileOf(r.tail,'tail'))why='找不到尾帧图';else if(cnt[t.name]>1)why='名称重复';
+  why?bad.push({...t,why}):ok.push(t)});return{ok,bad,names}}
+function stat(){const{ok,bad,names}=analyze();
+ document.querySelectorAll('[data-clip]').forEach(el=>el.placeholder=names[+el.dataset.clip]||(cfg.vm=='thumb'?'片段名称':'自动'));
+ const total=ok.reduce((s,t)=>s+costOf(t.r),0),on=ACC.filter(x=>x.status=='ok'&&x.enabled!==0),pool=on.reduce((s,x)=>s+Math.max(0,x.daily_limit-x.used),0),maxLim=Math.max(0,...on.map(x=>x.daily_limit)),maxCost=Math.max(0,...ok.map(t=>costOf(t.r)));
+ bc.textContent=ok.length;sub.disabled=sub2.disabled=!ok.length;sub.textContent=sub2.textContent=ok.length?`提交 ${ok.length} 条任务`:'提交任务';
+ let w='';if(!on.length)w='<div class="warn">还没有可用账号，任务会先排队</div>';
+ else if(maxCost>maxLim)w=`<div class="warn">有视频单个 ${maxCost} 点，超过账号每日 ${maxLim} 点，无法生成</div>`;
+ else if(total>pool)w=`<div class="warn">点数还差 ${total-pool}，超出的任务会排队，等点数刷新后继续</div>`;
+ psum.innerHTML=`可提交 <b>${ok.length}</b> 条 · 预计消耗 <b>${total}</b> 点<br><span class="sub">账号池今日剩余 ${pool} 点</span>${w}`;
+ sbt.innerHTML=`可提交 <b>${ok.length}</b> 条 · 预计 <b>${total}</b> 点 · 剩余 ${pool} 点${bad.length?` · <span class="warn">${bad.length} 条不完整</span>`:''}`;
+ const li=t=>`<div class="bi"><img src="${urlOf(fileOf(t.r.img))}" onerror="this.style.visibility='hidden'"><span><b>${esc(t.name||'—')}</b> ${t.why?`<b class="warn">${t.why}</b>`:`<span class="sub">${effSec(t.r)}秒 · ${costOf(t.r)}点</span>`}<br><span class="sub">${esc((t.r.prompt||'').slice(0,40))}</span></span></div>`;
+ bl.innerHTML=(ok.length?ok.map(li).join(''):'<div class="empty">暂无任务</div>')+(bad.length?`<div class="sub" style="margin:10px 0 4px">不完整，提交时将跳过（${bad.length}）</div>`+bad.map(li).join(''):'')}
+async function submitRows(){const{ok,bad}=analyze();if(!ok.length)return;sub.disabled=sub2.disabled=true;
+ try{const b=await api('/api/batches',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({names:ok.map(t=>t.name)})});
+  for(const t of ok){const r=t.r,f=new FormData();f.append('batch',b.id);f.append('clip',t.name);f.append('prompt',r.prompt.trim());f.append('model',MODELS[cfg.model]);f.append('mode',r.mode);f.append('seconds',effSec(r));f.append('ratio',cfg.ratio);f.append('image',fileOf(r.img));
+   if(r.mode=='frame'&&r.tail.trim()){const tf=fileOf(r.tail,'tail');tf&&f.append('tail',tf)}
+   await api('/api/tasks/add',{method:'POST',body:f})}
+  const total=ok.reduce((s,t)=>s+costOf(t.r),0),done=new Set(ok.map(t=>t.i));R=R.filter((_,i)=>!done.has(i));if(!R.length)R=[newRow(),newRow(),newRow()];
+  toast(`已提交 ${ok.length} 条，预计 ${total} 点，保存到 ${b.folder}${bad.length?`；${bad.length} 条不完整已保留在表格里`:''}`);renderRows();tab(2);load()
+ }catch(e){toast('提交失败：'+e.message)}stat()}
+/* queue */
+let OPEN=new Set(),lastB=0,TQ=[],BQ=[];
+const fmtT=s=>{const d=new Date(String(s).replace(' ','T')+'Z'),p=n=>String(n).padStart(2,'0');return(d.toDateString()==new Date().toDateString()?'今天':`${p(d.getMonth()+1)}-${p(d.getDate())}`)+` ${p(d.getHours())}:${p(d.getMinutes())}`};
+function renderSeg(){const L=[['all','全部'],['running','进行中'],['done','已完成'],['failed','失败']];seg.innerHTML=L.map(([k,n])=>`<div class="${F==k?'on':''}" onclick="F='${k}';renderSeg();renderQueue()">${n}</div>`).join('')}
+function togB(id){OPEN.has(id)?OPEN.delete(id):OPEN.add(id);renderQueue()}
+function revealB(id){fetch(`/api/batches/${id}/reveal`,{method:'POST'})}
+function taskRow(x,ver){const enc=x.output?encodeURIComponent(x.output):'',nm=x.clip||('#'+x.id);
+ const acts=`<div class="acts">${x.output?`<a class="btn sm" href="/api/file?path=${enc}${tokQ()}" target="_blank">预览</a><a class="btn sm" href="/api/file?path=${enc}&dl=1${tokQ()}" download>下载</a>`:''}${x.status=='done'?`<button class="btn sm" onclick="post('/api/tasks/${x.id}/regen')">重生</button>`:''}${x.status=='failed'?`<button class="btn sm" onclick="post('/api/tasks/${x.id}/redo')">重试</button>`:''}</div>`;
+ if(ver)return `<div><span>↳</span><b style="color:var(--txt)">${esc(nm)}</b><span class="st ${x.status}">${SL[x.status]||esc(x.status)}</span>${acts}</div>`;
+ return `<div class="item c"><img class="th" src="${x.image?'/api/file?path='+encodeURIComponent(x.image)+tokQ():''}" onerror="this.style.visibility='hidden'">
+  <div class="m"><b>${esc(nm)}</b><span class="tag">${esc(x.model||'Flow')}</span> <span class="st ${x.status}">${SL[x.status]||esc(x.status)}</span>
+  <div class="sub">${x.seconds||10} 秒 · ${x.ratio||'9:16'} · ${x.cost||DC()} 点 · ${x.mode=='frame'?'帧':'素材'}${x.account?' · '+esc(x.account):''}</div>
+  <div class="sub">${esc((x.prompt||'').slice(0,80))}${x.error?' · '+esc(x.error):''}</div></div>${acts}</div>`}
+function renderQueue(){const t=TQ,bs=BQ,kw=(q.value||'').toLowerCase();
+ const match=x=>(F=='all'||x.status==F||(F=='running'&&x.status=='pending'))&&(!kw||((x.clip||'')+(x.prompt||'')+(x.image||'')+x.id).toLowerCase().includes(kw));
+ const by={};t.forEach(x=>{const k=x.batch||0;(by[k]=by[k]||[]).push(x)});
+ if(bs[0]&&bs[0].id>lastB){OPEN=new Set([bs[0].id]);lastB=bs[0].id}
+ const html=Object.keys(by).map(Number).sort((a,b)=>b-a).map(id=>{
+  const all=by[id].slice().sort((a,b)=>a.id-b.id),shown=all.filter(match);if(!shown.length)return'';
+  const bm=bs.find(b=>b.id==id),c=s=>all.filter(x=>x.status==s).length,open=OPEN.has(id)||!!kw,ids=new Set(shown.map(x=>x.id));
+  let body='';
+  if(open){const roots=shown.filter(x=>!x.parent||!ids.has(x.parent));
+   body=roots.map(r=>{const vs=shown.filter(v=>v.parent==r.id);return taskRow(r)+(vs.length?`<div class="vers">${vs.map(v=>taskRow(v,1)).join('')}</div>`:'')}).join('')}
+  return `<div class="bh" onclick="togB(${id})"><span class="chev">${open?'▾':'▸'}</span><b>${id?fmtT(bm?bm.created:''):'未分批的任务'}</b><span class="sub">${all.length} 条 · 完成 ${c('done')}${c('running')?' · 进行中 '+c('running'):''}${c('pending')?' · 排队 '+c('pending'):''}${c('failed')?' · 失败 '+c('failed'):''}</span>${bm?`<span class="tag">${esc(bm.folder.split(/[\\/]/).pop())}</span>`:''}<span class="sp"></span>
+   ${id?`<button class="btn sm" ${c('failed')?'':'disabled'} onclick="event.stopPropagation();post('/api/batches/${id}/retry_failed')">重试失败</button><button class="btn sm" onclick="event.stopPropagation();revealB(${id})">定位文件夹</button>`:''}</div>${body}`}).join('');
+ tasks.innerHTML=html||'<div class="item" style="color:var(--mut)">暂无任务</div>'}
+async function load(){
+ let a,t,bs;
+ try{[a,t,bs]=await Promise.all(['/api/accounts','/api/tasks','/api/batches'].map(u=>fetch(u).then(r=>{if(!r.ok)throw new Error('http'+r.status);return r.json()})));bar('')}
+ catch(e){if(/http423/.test(e.message)){showLock('unlock');return}
+  bar(/http404/.test(e.message)?'后台服务版本过旧，请关闭后重新启动软件':'无法连接后台服务，请确认软件正在运行');return}
+ TQ=t;BQ=bs;ACC=a;
+ const c=s=>t.filter(x=>x.status==s).length;
+ tsum.textContent=`排队 ${c('pending')} · 进行中 ${c('running')} · 完成 ${c('done')} · 失败 ${c('failed')}`;
+ const on=a.filter(x=>x.status=='ok'&&x.enabled!==0),rem=x=>Math.max(0,x.daily_limit-x.used);
+ sum.textContent=`今日剩余 ${on.reduce((s,x)=>s+rem(x),0)} 点 · 约还能生成 ${on.reduce((s,x)=>s+Math.floor(rem(x)/DC()),0)} 个视频`;
+ acc.innerHTML=a.length?a.map(x=>{const p=x.daily_limit?Math.min(100,x.used/x.daily_limit*100):0;return `<tr><td><b>${esc(x.name)}</b><div class="sub">#${x.id}</div></td><td><span class="st ${x.status}">${TL[x.status]||esc(x.status)}</span></td>
+ <td><b>${x.used}</b> / ${x.daily_limit} 点<div class="bar"><i style="width:${p}%"></i></div><div class="sub" style="margin-top:4px">约还能生成 ${Math.floor(rem(x)/DC())} 个</div></td>
+ <td><div class="cp"><button class="btn sm" onclick="cp(${x.id},'name')">账号</button>${x.has_pw?`<button class="btn sm" onclick="cp(${x.id},'password')">密码</button>`:''}${x.has_totp?`<button class="btn sm" onclick="cp(${x.id},'totp')">验证码</button>`:''}</div></td>
+ <td style="white-space:nowrap"><button class="btn" onclick="post('/api/accounts/${x.id}/login')">登录</button><button class="btn" onclick="post('/api/accounts/${x.id}/mark_ok')">标记正常</button><button class="btn d" onclick="confirm('删除?')&&fetch('/api/accounts/${x.id}',{method:'DELETE'}).then(load)">删除</button></td></tr>`}).join(''):'<tr><td colspan="5" style="color:var(--mut)">还没有账号，点击右上角「添加账号」。</td></tr>';
+ renderQueue();stat();
+ const cur={};t.forEach(x=>cur[x.id]=x.status);
+ if(prevS)t.forEach(x=>{if(prevS[x.id]&&prevS[x.id]!=x.status&&(x.status=='done'||x.status=='failed')){toast(`${x.clip||'任务 #'+x.id} ${SL[x.status]}`);beep(x.status=='done')}});
+ prevS=cur}
+(async()=>{
+ slots.addEventListener('paste',onPaste);ui();renderModels();renderSeg();renderRows();
+ if(await checkLock())load();setInterval(()=>{if(!lockM.classList.contains('on'))load()},3000)})();
+</script></body></html>
